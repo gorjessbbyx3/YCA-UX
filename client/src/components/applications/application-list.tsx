@@ -441,20 +441,23 @@ export default function ApplicationList({ campus, status }: ApplicationListProps
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center">
                     <Brain className="w-5 h-5 mr-2" />
-                    AI Analysis
+                    AI Analysis (Powered by xAI Grok)
                   </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Get intelligent insights about this application using advanced AI analysis
+                  </p>
                 </CardHeader>
                 <CardContent>
                   {!analysisResult ? (
                     <Button 
                       onClick={() => analyzeApplication(selectedApplication.id)}
                       disabled={isAnalyzing}
-                      className="bg-island-green hover:bg-island-green/90"
+                      className="bg-island-green hover:bg-island-green/90 w-full"
                     >
                       {isAnalyzing ? (
                         <>
                           <i className="fas fa-spinner fa-spin mr-2"></i>
-                          Analyzing Application...
+                          Analyzing Application with xAI Grok...
                         </>
                       ) : (
                         <>
@@ -464,8 +467,25 @@ export default function ApplicationList({ campus, status }: ApplicationListProps
                       )}
                     </Button>
                   ) : (
-                    <div className="p-4 bg-blue-50 rounded-lg">
-                      <pre className="whitespace-pre-wrap text-sm">{analysisResult}</pre>
+                    <div className="space-y-4">
+                      <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                        <h4 className="font-semibold text-blue-800 mb-2">AI Analysis Results:</h4>
+                        <div className="prose prose-sm max-w-none">
+                          <pre className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">{analysisResult}</pre>
+                        </div>
+                      </div>
+                      <Button 
+                        onClick={() => {
+                          setAnalysisResult("");
+                          analyzeApplication(selectedApplication.id);
+                        }}
+                        variant="outline"
+                        disabled={isAnalyzing}
+                        className="w-full"
+                      >
+                        <Brain className="w-4 h-4 mr-2" />
+                        Regenerate Analysis
+                      </Button>
                     </div>
                   )}
                 </CardContent>

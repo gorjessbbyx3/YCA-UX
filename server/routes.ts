@@ -4,11 +4,23 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertApplicationSchema, insertCadetSchema } from "@shared/schema";
 import { z } from "zod";
-import { analyzeApplication } from "./gemini";
+import { analyzeApplication, generateCadetInsights } from "./gemini";
+import { checkSystemHealth } from "./health";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
+
+  // System health check
+  app.get('/api/health', async (req, res) => {
+    try {
+      const health = await checkSystemHealth();
+      res.json(health);
+    } catch (error) {
+      console.error("Health check failed:", error);
+      res.status(500).json({ message: "Health check failed" });
+    }
+  });
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
@@ -204,6 +216,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error analyzing application:", error);
       res.status(500).json({ message: "Failed to analyze application" });
+    }
+  });
+
+  // AI-powered cadet insights
+  app.post('/api/cadets/:id/insights', isAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const cadet = await storage.getCadet(id);
+      if (!cadet) {
+        return res.status(404).json({ message: "Cadet not found" });
+      }
+
+      const insights = await generateCadetInsights(cadet);
+      res.json({ insights });
+    } catch (error) {
+      console.error("Error generating cadet insights:", error);
+      res.status(500).json({ message: "Failed to generate cadet insights" });
     }
   });
 

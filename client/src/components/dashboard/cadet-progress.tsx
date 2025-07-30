@@ -1,14 +1,51 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/api";
 
 export default function CadetProgress() {
-  // This would typically come from an API call
-  const progressData = [
-    { name: 'Academic Excellence', value: 78, color: 'bg-navy' },
-    { name: 'Physical Fitness', value: 82, color: 'bg-island-green' },
-    { name: 'Leadership Development', value: 71, color: 'bg-gold' },
-    { name: 'Community Service', value: 91, color: 'bg-green-500' },
-  ];
+  const { data: progressData = [], isLoading } = useQuery({
+    queryKey: ['cadet-progress'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/cadets');
+      const cadets = await response.json();
+
+      if (!cadets.length) return [];
+
+      // Calculate average progress across all cadets
+      const avgAcademic = cadets.reduce((sum: number, cadet: any) => sum + (cadet.academicProgress || 0), 0) / cadets.length;
+      const avgFitness = cadets.reduce((sum: number, cadet: any) => sum + (cadet.fitnessProgress || 0), 0) / cadets.length;
+      const avgLeadership = cadets.reduce((sum: number, cadet: any) => sum + (cadet.leadershipProgress || 0), 0) / cadets.length;
+      const avgService = cadets.reduce((sum: number, cadet: any) => sum + (cadet.serviceHours || 0), 0) / cadets.length;
+
+      return [
+        { name: "Academic Progress", value: Math.round(avgAcademic), color: "bg-blue-500" },
+        { name: "Physical Fitness", value: Math.round(avgFitness), color: "bg-green-500" },
+        { name: "Leadership Skills", value: Math.round(avgLeadership), color: "bg-yellow-500" },
+        { name: "Community Service", value: Math.round(Math.min(avgService, 100)), color: "bg-purple-500" },
+      ];
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Current Class Progress</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-2 bg-gray-200 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

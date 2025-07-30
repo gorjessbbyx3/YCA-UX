@@ -5,6 +5,10 @@ import type { Application } from "@shared/schema";
 const GROK_API_KEY = process.env.GROK_API_KEY || "";
 const GROK_API_URL = "https://api.x.ai/v1/chat/completions";
 
+if (!GROK_API_KEY) {
+  console.warn("GROK_API_KEY environment variable is not set. AI features will not work properly.");
+}
+
 export async function analyzeApplication(application: Application): Promise<string> {
   try {
     const prompt = `Analyze this Youth Challenge Academy application and provide insights on the applicant's suitability, potential challenges, and recommendations for success:
