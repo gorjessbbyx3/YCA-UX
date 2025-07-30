@@ -1,7 +1,8 @@
-import { GoogleGenAI } from "@google/genai";
+
+import { Grok } from "@x-ai/grok-sdk";
 import type { Application } from "@shared/schema";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const grok = new Grok({ apiKey: process.env.GROK_API_KEY || "" });
 
 export async function analyzeApplication(application: Application): Promise<string> {
   try {
@@ -31,12 +32,17 @@ Please provide:
 
 Format your response as a structured assessment suitable for staff review.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
+    const response = await grok.chat.completions.create({
+      model: "grok-beta",
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
     });
 
-    return response.text || "Analysis could not be completed";
+    return response.choices[0]?.message?.content || "Analysis could not be completed";
   } catch (error) {
     console.error("Error analyzing application:", error);
     throw new Error(`Failed to analyze application: ${error}`);
@@ -71,12 +77,17 @@ Provide:
 
 Format as actionable insights for staff.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
+    const response = await grok.chat.completions.create({
+      model: "grok-beta",
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
     });
 
-    return response.text || "Insights could not be generated";
+    return response.choices[0]?.message?.content || "Insights could not be generated";
   } catch (error) {
     console.error("Error generating cadet insights:", error);
     throw new Error(`Failed to generate insights: ${error}`);
