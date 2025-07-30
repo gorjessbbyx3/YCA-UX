@@ -1,8 +1,9 @@
 
-import { Grok } from "@x-ai/grok-sdk";
+import axios from 'axios';
 import type { Application } from "@shared/schema";
 
-const grok = new Grok({ apiKey: process.env.GROK_API_KEY || "" });
+const GROK_API_KEY = process.env.GROK_API_KEY || "";
+const GROK_API_URL = "https://api.x.ai/v1/chat/completions";
 
 export async function analyzeApplication(application: Application): Promise<string> {
   try {
@@ -32,7 +33,7 @@ Please provide:
 
 Format your response as a structured assessment suitable for staff review.`;
 
-    const response = await grok.chat.completions.create({
+    const response = await axios.post(GROK_API_URL, {
       model: "grok-beta",
       messages: [
         {
@@ -40,9 +41,14 @@ Format your response as a structured assessment suitable for staff review.`;
           content: prompt
         }
       ]
+    }, {
+      headers: {
+        'Authorization': `Bearer ${GROK_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
     });
 
-    return response.choices[0]?.message?.content || "Analysis could not be completed";
+    return response.data.choices[0]?.message?.content || "Analysis could not be completed";
   } catch (error) {
     console.error("Error analyzing application:", error);
     throw new Error(`Failed to analyze application: ${error}`);
@@ -77,7 +83,7 @@ Provide:
 
 Format as actionable insights for staff.`;
 
-    const response = await grok.chat.completions.create({
+    const response = await axios.post(GROK_API_URL, {
       model: "grok-beta",
       messages: [
         {
@@ -85,9 +91,14 @@ Format as actionable insights for staff.`;
           content: prompt
         }
       ]
+    }, {
+      headers: {
+        'Authorization': `Bearer ${GROK_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
     });
 
-    return response.choices[0]?.message?.content || "Insights could not be generated";
+    return response.data.choices[0]?.message?.content || "Insights could not be generated";
   } catch (error) {
     console.error("Error generating cadet insights:", error);
     throw new Error(`Failed to generate insights: ${error}`);
