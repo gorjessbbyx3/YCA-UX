@@ -7,6 +7,7 @@ This is a full-stack web application designed for staff at the Hawaii Youth Chal
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Background style: Light military green theme.
 
 ## System Architecture
 
