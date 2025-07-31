@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/api";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function CadetProgress() {
   const { data: progressData = [], isLoading } = useQuery({

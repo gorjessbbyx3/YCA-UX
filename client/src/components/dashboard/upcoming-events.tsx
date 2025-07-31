@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/authUtils";
+import { apiRequest } from "@/lib/queryClient";
 import { format } from "date-fns";
 
 interface UpcomingEventsProps {
