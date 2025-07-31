@@ -3,122 +3,66 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-navy via-light-navy to-island-green">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <div className="w-20 h-20 bg-gold rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <i className="fas fa-shield-alt text-navy text-3xl"></i>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-            Hawaii National Guard
-          </h1>
-          <h2 className="text-2xl md:text-3xl font-semibold text-gold mb-6">
-            Youth Challenge Academy
-          </h2>
-          <p className="text-xl text-gray-200 max-w-2xl mx-auto mb-8">
-            Staff Portal - Empowering at-promise youth through character development, 
-            education, and responsible citizenship in the spirit of Aloha.
-          </p>
-          <Button 
-            size="lg" 
-            className="bg-gold hover:bg-gold/90 text-navy font-semibold px-8 py-4 text-lg"
-            onClick={() => window.location.href = '/api/login'}
-          >
-            <i className="fas fa-sign-in-alt mr-2"></i>
-            Staff Login
-          </Button>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <Card className="bg-white/95 backdrop-blur-sm">
-            <CardHeader>
-              <div className="w-12 h-12 bg-navy rounded-lg flex items-center justify-center mb-4">
-                <i className="fas fa-users text-white"></i>
+    <div className="min-h-screen bg-gradient-to-br from-navy via-light-navy to-island-green flex items-center justify-center">
+      <div className="container mx-auto px-4">
+        {/* Main Login Card */}
+        <div className="max-w-md mx-auto">
+          <Card className="bg-white/95 backdrop-blur-sm shadow-2xl">
+            <CardHeader className="text-center pb-2">
+              <div className="w-16 h-16 bg-gold rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i className="fas fa-shield-alt text-navy text-2xl"></i>
               </div>
-              <CardTitle className="text-navy">Cadet Management</CardTitle>
-              <CardDescription>
-                Comprehensive tracking and management of cadet progress, attendance, and development.
+              <CardTitle className="text-2xl font-bold text-navy mb-2">
+                Staff Login Portal
+              </CardTitle>
+              <CardDescription className="text-base">
+                Hawaii National Guard Youth Challenge Academy
               </CardDescription>
             </CardHeader>
+            <CardContent className="pt-6">
+              <div className="text-center mb-6">
+                <p className="text-gray-600 mb-4">
+                  Access the staff management system for both Oahu and Hilo campuses.
+                </p>
+                <Button 
+                  size="lg" 
+                  className="w-full bg-navy hover:bg-light-navy text-white font-semibold py-3"
+                  onClick={() => window.location.href = '/api/login'}
+                >
+                  <i className="fas fa-sign-in-alt mr-2"></i>
+                  Login with Replit
+                </Button>
+              </div>
+              
+              <div className="border-t pt-4">
+                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                  <div className="text-center">
+                    <i className="fas fa-users text-island-green mb-1"></i>
+                    <p className="font-medium">Cadet Management</p>
+                  </div>
+                  <div className="text-center">
+                    <i className="fas fa-graduation-cap text-gold mb-1"></i>
+                    <p className="font-medium">Academic Tracking</p>
+                  </div>
+                  <div className="text-center">
+                    <i className="fas fa-calendar-alt text-navy mb-1"></i>
+                    <p className="font-medium">Event Scheduling</p>
+                  </div>
+                  <div className="text-center">
+                    <i className="fas fa-chart-bar text-island-green mb-1"></i>
+                    <p className="font-medium">Progress Reports</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
           </Card>
-
-          <Card className="bg-white/95 backdrop-blur-sm">
-            <CardHeader>
-              <div className="w-12 h-12 bg-island-green rounded-lg flex items-center justify-center mb-4">
-                <i className="fas fa-graduation-cap text-white"></i>
-              </div>
-              <CardTitle className="text-navy">Academic Excellence</CardTitle>
-              <CardDescription>
-                Monitor academic progress and HiSET preparation for all cadets across both campuses.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur-sm">
-            <CardHeader>
-              <div className="w-12 h-12 bg-gold rounded-lg flex items-center justify-center mb-4">
-                <i className="fas fa-hands-helping text-navy"></i>
-              </div>
-              <CardTitle className="text-navy">Community Service</CardTitle>
-              <CardDescription>
-                Track community service hours and coordinate with partner organizations.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur-sm">
-            <CardHeader>
-              <div className="w-12 h-12 bg-navy rounded-lg flex items-center justify-center mb-4">
-                <i className="fas fa-calendar-alt text-white"></i>
-              </div>
-              <CardTitle className="text-navy">Scheduling</CardTitle>
-              <CardDescription>
-                Efficient scheduling system for events, training, and staff coordination.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur-sm">
-            <CardHeader>
-              <div className="w-12 h-12 bg-island-green rounded-lg flex items-center justify-center mb-4">
-                <i className="fas fa-handshake text-white"></i>
-              </div>
-              <CardTitle className="text-navy">Mentorship</CardTitle>
-              <CardDescription>
-                Coordinate mentorship programs and track cadet-mentor relationships.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur-sm">
-            <CardHeader>
-              <div className="w-12 h-12 bg-gold rounded-lg flex items-center justify-center mb-4">
-                <i className="fas fa-file-alt text-navy"></i>
-              </div>
-              <CardTitle className="text-navy">Applications</CardTitle>
-              <CardDescription>
-                Review and process applications from prospective cadets statewide.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-
-        <div className="text-center mt-16">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto">
-            <h3 className="text-2xl font-semibold text-white mb-4">Our Campuses</h3>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="text-left">
-                <h4 className="text-xl font-semibold text-gold mb-2">Oahu Campus (Kalaeloa)</h4>
-                <p className="text-gray-200 mb-2">91-1096 Shangrila St, Kapolei, HI 96707</p>
-                <p className="text-gray-200 mb-2">Basic Youth Challenge Program (16-18 years)</p>
-                <p className="text-gray-200">Contact: 808-685-7135</p>
-              </div>
-              <div className="text-left">
-                <h4 className="text-xl font-semibold text-gold mb-2">Hilo Job Challenge Academy</h4>
-                <p className="text-gray-200 mb-2">1046 Leilani St, Hilo, HI 96720</p>
-                <p className="text-gray-200 mb-2">Career Training for YCA Graduates (17-20 years)</p>
-                <p className="text-gray-200">Contact: 808-430-4184</p>
-              </div>
+          
+          {/* Campus Info */}
+          <div className="mt-8 text-center">
+            <p className="text-white/80 text-sm mb-2">Serving Hawaii's At-Promise Youth</p>
+            <div className="flex justify-center space-x-6 text-gold text-sm">
+              <span><i className="fas fa-map-marker-alt mr-1"></i>Oahu Campus</span>
+              <span><i className="fas fa-map-marker-alt mr-1"></i>Hilo Campus</span>
             </div>
           </div>
         </div>
