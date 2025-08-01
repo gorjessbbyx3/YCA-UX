@@ -4,6 +4,12 @@
 
 This is a full-stack web application designed for staff at the Hawaii Youth Challenge Academy to manage cadets, applications, events, and administrative tasks. The system serves as a comprehensive management portal for the academy's operations across two campuses (Oahu and Hilo).
 
+## Recent Changes (January 2025)
+- Added dedicated Calendar page with comprehensive month/week/day views and event creation
+- Restructured Scheduling page to focus on advanced event management, bulk creation, and resource allocation
+- Updated navigation system to separate Calendar and Event Scheduling functionality
+- Enhanced event management with conflict detection and recurring event support
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -44,10 +50,21 @@ Background style: Light military green theme.
 - **Users**: Staff accounts with roles and campus assignments
 - **Cadets**: Student records with comprehensive tracking
 - **Applications**: Admission applications with status workflow
-- **Events**: Campus events and scheduling
+- **Events**: Campus events with comprehensive scheduling, recurring events, and conflict detection
 - **Mentorships**: Mentor-cadet relationships
 - **Inventory**: Equipment and resource tracking
 - **Activities**: System activity logging
+
+### Key Pages
+- **Dashboard**: Real-time metrics and activity overview
+- **Calendar**: Month/week/day views with event creation and management
+- **Event Scheduling**: Advanced bulk event creation and resource conflict management
+- **Cadet Management**: Comprehensive cadet tracking and progress monitoring
+- **Academic Progress**: Grade tracking and performance analytics
+- **Applications**: Application review with AI-powered insights
+- **Mentorship**: Mentor-cadet relationship tracking
+- **Inventory**: Equipment and resource management with alerts
+- **Reports**: Analytics and data visualization
 
 ### AI Integration
 - Google Gemini AI for application analysis and insights

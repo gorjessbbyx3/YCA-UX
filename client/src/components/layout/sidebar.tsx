@@ -4,7 +4,8 @@ import { cn } from "@/lib/utils";
 const navigation = [
   { name: 'Dashboard', href: '/', icon: 'fas fa-tachometer-alt' },
   { name: 'Cadet Management', href: '/cadets', icon: 'fas fa-users' },
-  { name: 'Scheduling', href: '/scheduling', icon: 'fas fa-calendar-alt' },
+  { name: 'Calendar', href: '/calendar', icon: 'fas fa-calendar' },
+  { name: 'Event Scheduling', href: '/scheduling', icon: 'fas fa-clock' },
   { name: 'Academic Progress', href: '/academics', icon: 'fas fa-graduation-cap' },
   { name: 'Mentorship', href: '/mentorship', icon: 'fas fa-handshake' },
   { name: 'Inventory', href: '/inventory', icon: 'fas fa-boxes' },
