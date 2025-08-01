@@ -28,35 +28,35 @@ export interface IStorage {
   // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
-  
+
   // Cadet operations
   getCadets(campus?: string): Promise<Cadet[]>;
   getCadet(id: number): Promise<Cadet | undefined>;
   createCadet(cadet: InsertCadet): Promise<Cadet>;
   updateCadet(id: number, cadet: Partial<InsertCadet>): Promise<Cadet>;
-  
+
   // Application operations
   getApplications(status?: string, campus?: string): Promise<Application[]>;
   getApplication(id: number): Promise<Application | undefined>;
   createApplication(application: InsertApplication): Promise<Application>;
   updateApplication(id: number, application: Partial<InsertApplication>): Promise<Application>;
-  
+
   // Event operations
   getEvents(campus?: string, startDate?: Date, endDate?: Date): Promise<Event[]>;
   createEvent(event: InsertEvent): Promise<Event>;
-  
+
   // Mentorship operations
   getMentorships(cadetId?: number): Promise<Mentorship[]>;
   createMentorship(mentorship: InsertMentorship): Promise<Mentorship>;
-  
+
   // Inventory operations
   getInventory(campus?: string, category?: string): Promise<Inventory[]>;
   updateInventoryItem(id: number, item: Partial<InsertInventory>): Promise<Inventory>;
-  
+
   // Activity operations
   getRecentActivities(campus?: string, limit?: number): Promise<Activity[]>;
   createActivity(activity: InsertActivity): Promise<Activity>;
-  
+
   // Dashboard metrics
   getDashboardMetrics(campus?: string): Promise<{
     activeCadets: number;
@@ -104,7 +104,7 @@ export class DatabaseStorage implements IStorage {
 
   async createCadet(cadet: InsertCadet): Promise<Cadet> {
     const [newCadet] = await db.insert(cadets).values(cadet).returning();
-    
+
     // Create activity log
     await this.createActivity({
       type: 'cadet_activity',
@@ -114,7 +114,7 @@ export class DatabaseStorage implements IStorage {
       relatedType: 'cadet',
       campus: cadet.campus,
     });
-    
+
     return newCadet;
   }
 
@@ -130,15 +130,15 @@ export class DatabaseStorage implements IStorage {
   // Application operations
   async getApplications(status?: string, campus?: string): Promise<Application[]> {
     let query = db.select().from(applications).orderBy(desc(applications.submittedAt));
-    
+
     const conditions = [];
     if (status) conditions.push(eq(applications.status, status));
     if (campus) conditions.push(eq(applications.preferredCampus, campus));
-    
+
     if (conditions.length > 0) {
       return await query.where(and(...conditions));
     }
-    
+
     return await query;
   }
 
@@ -149,7 +149,7 @@ export class DatabaseStorage implements IStorage {
 
   async createApplication(application: InsertApplication): Promise<Application> {
     const [newApplication] = await db.insert(applications).values(application).returning();
-    
+
     await this.createActivity({
       type: 'system_event',
       title: 'New Application Received',
@@ -158,7 +158,7 @@ export class DatabaseStorage implements IStorage {
       relatedType: 'application',
       campus: application.preferredCampus,
     });
-    
+
     return newApplication;
   }
 
@@ -174,16 +174,16 @@ export class DatabaseStorage implements IStorage {
   // Event operations
   async getEvents(campus?: string, startDate?: Date, endDate?: Date): Promise<Event[]> {
     let query = db.select().from(events).orderBy(events.startTime);
-    
+
     const conditions = [];
     if (campus) conditions.push(eq(events.campus, campus));
     if (startDate) conditions.push(gte(events.startTime, startDate));
     if (endDate) conditions.push(lte(events.startTime, endDate));
-    
+
     if (conditions.length > 0) {
       return await query.where(and(...conditions));
     }
-    
+
     return await query;
   }
 
@@ -209,15 +209,15 @@ export class DatabaseStorage implements IStorage {
   // Inventory operations
   async getInventory(campus?: string, category?: string): Promise<Inventory[]> {
     let query = db.select().from(inventory).orderBy(inventory.itemName);
-    
+
     const conditions = [];
     if (campus) conditions.push(eq(inventory.campus, campus));
     if (category) conditions.push(eq(inventory.category, category));
-    
+
     if (conditions.length > 0) {
       return await query.where(and(...conditions));
     }
-    
+
     return await query;
   }
 
@@ -233,11 +233,11 @@ export class DatabaseStorage implements IStorage {
   // Activity operations
   async getRecentActivities(campus?: string, limit: number = 10): Promise<Activity[]> {
     let query = db.select().from(activities).orderBy(desc(activities.createdAt)).limit(limit);
-    
+
     if (campus) {
       return await query.where(eq(activities.campus, campus));
     }
-    
+
     return await query;
   }
 

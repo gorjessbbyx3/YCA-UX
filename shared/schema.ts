@@ -69,7 +69,7 @@ export const cadets = pgTable("cadets", {
   physicalFitness: decimal("physical_fitness", { precision: 5, scale: 2 }).default("0"), // President's Challenge fitness standards
   responsibleCitizenship: decimal("responsible_citizenship", { precision: 5, scale: 2 }).default("0"), // Civics, voting registration, government understanding
   communityService: decimal("community_service", { precision: 5, scale: 2 }).default("0"), // Service hours completion (minimum 40 hours)
-  
+
   serviceHours: integer("service_hours").default(0), // Actual hours completed
   tabeScoreMath: integer("tabe_score_math"), // TABE math score
   tabeScoreReading: integer("tabe_score_reading"), // TABE reading score

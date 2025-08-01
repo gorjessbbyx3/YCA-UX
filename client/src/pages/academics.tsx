@@ -17,16 +17,16 @@ export default function Academics() {
     enabled: !!user,
   });
 
-  // Calculate academic statistics
+  // Calculate academic statistics based on Academic Excellence component
   const academicStats = cadets.reduce(
     (acc: any, cadet: any) => {
-      const academicProgress = parseFloat(cadet.academicProgress || 0);
+      const academicExcellence = parseFloat(cadet.academicExcellence || cadet.academicProgress || 0);
       acc.totalCadets += 1;
-      acc.totalProgress += academicProgress;
+      acc.totalProgress += academicExcellence;
       
-      if (academicProgress >= 90) acc.excellentPerformers += 1;
-      else if (academicProgress >= 70) acc.goodPerformers += 1;
-      else if (academicProgress >= 50) acc.needsImprovement += 1;
+      if (academicExcellence >= 90) acc.excellentPerformers += 1;
+      else if (academicExcellence >= 70) acc.goodPerformers += 1;
+      else if (academicExcellence >= 50) acc.needsImprovement += 1;
       else acc.atRisk += 1;
 
       return acc;
@@ -46,8 +46,8 @@ export default function Academics() {
     : 0;
 
   // Group cadets by performance level
-  const excellentCadets = cadets.filter((c: any) => parseFloat(c.academicProgress || 0) >= 90);
-  const atRiskCadets = cadets.filter((c: any) => parseFloat(c.academicProgress || 0) < 50);
+  const excellentCadets = cadets.filter((c: any) => parseFloat(c.academicExcellence || c.academicProgress || 0) >= 90);
+  const atRiskCadets = cadets.filter((c: any) => parseFloat(c.academicExcellence || c.academicProgress || 0) < 50);
 
   const getProgressColor = (progress: number) => {
     if (progress >= 90) return "text-green-600";
@@ -64,7 +64,8 @@ export default function Academics() {
   };
 
   const subjects = [
-    { name: "English Language Arts", average: 78, icon: BookOpen },
+    { name: "Language Arts - Reading", average: 78, icon: BookOpen },
+    { name: "Language Arts - Writing", average: 76, icon: BookOpen },
     { name: "Mathematics", average: 72, icon: Target },
     { name: "Science", average: 75, icon: TrendingUp },
     { name: "Social Studies", average: 81, icon: Award },
@@ -241,28 +242,37 @@ export default function Academics() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {excellentCadets.slice(0, 6).map((cadet: any) => (
-                      <div key={cadet.id} className="border border-green-200 rounded-lg p-3 bg-green-50">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-medium text-sm">
-                            {cadet.firstName} {cadet.lastName}
-                          </h4>
-                          <Badge className="bg-green-500 text-white text-xs">
-                            {parseFloat(cadet.academicProgress || 0).toFixed(1)}%
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-gray-600 mb-2">
-                          Class {cadet.classNumber} • {cadet.campus}
-                        </p>
-                        <div className="space-y-1">
-                          <div className="flex justify-between text-xs">
-                            <span>Academic Progress</span>
-                            <span className="font-medium">{parseFloat(cadet.academicProgress || 0).toFixed(1)}%</span>
+                    {excellentCadets.slice(0, 6).map((cadet: any) => {
+                      const academicScore = parseFloat(cadet.academicExcellence || cadet.academicProgress || 0);
+                      return (
+                        <div key={cadet.id} className="border border-green-200 rounded-lg p-3 bg-green-50">
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="font-medium text-sm">
+                              {cadet.firstName} {cadet.lastName}
+                            </h4>
+                            <Badge className="bg-green-500 text-white text-xs">
+                              {academicScore.toFixed(1)}%
+                            </Badge>
                           </div>
-                          <Progress value={parseFloat(cadet.academicProgress || 0)} className="h-1" />
+                          <p className="text-xs text-gray-600 mb-2">
+                            Class {cadet.classNumber} • {cadet.campus}
+                          </p>
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span>Academic Excellence</span>
+                              <span className="font-medium">{academicScore.toFixed(1)}%</span>
+                            </div>
+                            <Progress value={academicScore} className="h-1" />
+                            {cadet.tabeReadingScore && (
+                              <div className="flex justify-between text-xs">
+                                <span>TABE Reading</span>
+                                <span className="font-medium">{cadet.tabeReadingScore}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
@@ -279,35 +289,44 @@ export default function Academics() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {atRiskCadets.map((cadet: any) => (
-                      <div key={cadet.id} className="border border-red-200 rounded-lg p-3 bg-red-50">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-medium text-sm">
-                            {cadet.firstName} {cadet.lastName}
-                          </h4>
-                          <Badge variant="destructive" className="text-xs">
-                            At Risk
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-gray-600 mb-2">
-                          Class {cadet.classNumber} • {cadet.campus}
-                        </p>
-                        <div className="space-y-1">
-                          <div className="flex justify-between text-xs">
-                            <span>Academic Progress</span>
-                            <span className="font-medium text-red-600">
-                              {parseFloat(cadet.academicProgress || 0).toFixed(1)}%
-                            </span>
+                    {atRiskCadets.map((cadet: any) => {
+                      const academicScore = parseFloat(cadet.academicExcellence || cadet.academicProgress || 0);
+                      return (
+                        <div key={cadet.id} className="border border-red-200 rounded-lg p-3 bg-red-50">
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="font-medium text-sm">
+                              {cadet.firstName} {cadet.lastName}
+                            </h4>
+                            <Badge variant="destructive" className="text-xs">
+                              At Risk
+                            </Badge>
                           </div>
-                          <Progress value={parseFloat(cadet.academicProgress || 0)} className="h-1" />
-                        </div>
-                        {cadet.notes && (
-                          <p className="text-xs text-gray-600 mt-2 italic">
-                            Notes: {cadet.notes.substring(0, 50)}...
+                          <p className="text-xs text-gray-600 mb-2">
+                            Class {cadet.classNumber} • {cadet.campus}
                           </p>
-                        )}
-                      </div>
-                    ))}
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span>Academic Excellence</span>
+                              <span className="font-medium text-red-600">
+                                {academicScore.toFixed(1)}%
+                              </span>
+                            </div>
+                            <Progress value={academicScore} className="h-1" />
+                            {cadet.tabeReadingScore && (
+                              <div className="flex justify-between text-xs">
+                                <span>TABE Reading</span>
+                                <span className="font-medium text-red-600">{cadet.tabeReadingScore}</span>
+                              </div>
+                            )}
+                          </div>
+                          {cadet.notes && (
+                            <p className="text-xs text-gray-600 mt-2 italic">
+                              Notes: {cadet.notes.substring(0, 50)}...
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
@@ -329,18 +348,20 @@ export default function Academics() {
                           <th className="text-left py-2">Cadet</th>
                           <th className="text-left py-2">Class</th>
                           <th className="text-left py-2">Campus</th>
-                          <th className="text-left py-2">Academic Progress</th>
-                          <th className="text-left py-2">Fitness Progress</th>
-                          <th className="text-left py-2">Leadership Progress</th>
-                          <th className="text-left py-2">Service Hours</th>
+                          <th className="text-left py-2">Academic Excellence</th>
+                          <th className="text-left py-2">Physical Fitness</th>
+                          <th className="text-left py-2">Leadership</th>
+                          <th className="text-left py-2">Community Service</th>
+                          <th className="text-left py-2">TABE Scores</th>
                           <th className="text-left py-2">Performance</th>
                         </tr>
                       </thead>
                       <tbody>
                         {cadets.map((cadet: any) => {
-                          const academicProgress = parseFloat(cadet.academicProgress || 0);
-                          const fitnessProgress = parseFloat(cadet.fitnessProgress || 0);
-                          const leadershipProgress = parseFloat(cadet.leadershipProgress || 0);
+                          const academicExcellence = parseFloat(cadet.academicExcellence || cadet.academicProgress || 0);
+                          const physicalFitness = parseFloat(cadet.physicalFitness || cadet.fitnessProgress || 0);
+                          const leadership = parseFloat(cadet.leadershipFollowership || cadet.leadershipProgress || 0);
+                          const communityService = parseFloat(cadet.communityService || 0);
                           const serviceHours = parseInt(cadet.serviceHours || 0);
 
                           return (
@@ -364,44 +385,62 @@ export default function Academics() {
                               <td className="py-2">
                                 <div className="space-y-1">
                                   <div className="flex justify-between items-center w-24">
-                                    <span className={`text-sm font-medium ${getProgressColor(academicProgress)}`}>
-                                      {academicProgress.toFixed(1)}%
+                                    <span className={`text-sm font-medium ${getProgressColor(academicExcellence)}`}>
+                                      {academicExcellence.toFixed(1)}%
                                     </span>
                                   </div>
-                                  <Progress value={academicProgress} className="h-1 w-24" />
+                                  <Progress value={academicExcellence} className="h-1 w-24" />
                                 </div>
                               </td>
                               <td className="py-2">
                                 <div className="space-y-1">
                                   <div className="flex justify-between items-center w-24">
-                                    <span className={`text-sm font-medium ${getProgressColor(fitnessProgress)}`}>
-                                      {fitnessProgress.toFixed(1)}%
+                                    <span className={`text-sm font-medium ${getProgressColor(physicalFitness)}`}>
+                                      {physicalFitness.toFixed(1)}%
                                     </span>
                                   </div>
-                                  <Progress value={fitnessProgress} className="h-1 w-24" />
+                                  <Progress value={physicalFitness} className="h-1 w-24" />
                                 </div>
                               </td>
                               <td className="py-2">
                                 <div className="space-y-1">
                                   <div className="flex justify-between items-center w-24">
-                                    <span className={`text-sm font-medium ${getProgressColor(leadershipProgress)}`}>
-                                      {leadershipProgress.toFixed(1)}%
+                                    <span className={`text-sm font-medium ${getProgressColor(leadership)}`}>
+                                      {leadership.toFixed(1)}%
                                     </span>
                                   </div>
-                                  <Progress value={leadershipProgress} className="h-1 w-24" />
+                                  <Progress value={leadership} className="h-1 w-24" />
                                 </div>
                               </td>
                               <td className="py-2">
-                                <span className="font-medium">{serviceHours}</span>
-                                <span className="text-xs text-gray-600 ml-1">hrs</span>
+                                <div className="text-center">
+                                  <span className="font-medium">{Math.max(serviceHours, communityService)}</span>
+                                  <span className="text-xs text-gray-600 ml-1">hrs</span>
+                                </div>
+                              </td>
+                              <td className="py-2">
+                                <div className="text-xs space-y-1">
+                                  {cadet.tabeReadingScore && (
+                                    <div>R: {cadet.tabeReadingScore}</div>
+                                  )}
+                                  {cadet.tabeMathScore && (
+                                    <div>M: {cadet.tabeMathScore}</div>
+                                  )}
+                                  {cadet.tabeLanguageScore && (
+                                    <div>L: {cadet.tabeLanguageScore}</div>
+                                  )}
+                                  {!cadet.tabeReadingScore && !cadet.tabeMathScore && !cadet.tabeLanguageScore && (
+                                    <span className="text-gray-400">Not tested</span>
+                                  )}
+                                </div>
                               </td>
                               <td className="py-2">
                                 <Badge 
-                                  className={`${getProgressBadgeColor(academicProgress)} text-white`}
+                                  className={`${getProgressBadgeColor(academicExcellence)} text-white`}
                                 >
-                                  {academicProgress >= 90 ? "Excellent" :
-                                   academicProgress >= 70 ? "Good" :
-                                   academicProgress >= 50 ? "Fair" : "At Risk"}
+                                  {academicExcellence >= 90 ? "Excellent" :
+                                   academicExcellence >= 70 ? "Good" :
+                                   academicExcellence >= 50 ? "Fair" : "At Risk"}
                                 </Badge>
                               </td>
                             </tr>
