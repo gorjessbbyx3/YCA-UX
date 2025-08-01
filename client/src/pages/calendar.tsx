@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, addWeeks, eachHourOfInterval, setHours, startOfDay } from "date-fns";
 import Sidebar from "@/components/layout/sidebar";
 import MobileMenu from "@/components/layout/mobile-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +37,7 @@ type EventFormData = z.infer<typeof eventSchema>;
 export default function Calendar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"month" | "week" | "day">("month");
@@ -99,6 +100,10 @@ export default function Calendar() {
     setCurrentDate(direction === "prev" ? subMonths(currentDate, 1) : addMonths(currentDate, 1));
   };
 
+  const navigateWeek = (direction: "prev" | "next") => {
+    setCurrentWeek(direction === "prev" ? addWeeks(currentWeek, -1) : addWeeks(currentWeek, 1));
+  };
+
   // Get calendar days for the current month view
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -134,6 +139,32 @@ export default function Calendar() {
   const todayEvents = (events as any[]).filter((event: any) => 
     isSameDay(new Date(event.startTime), new Date())
   );
+
+  // Weekly schedule data
+  const weekStart = startOfWeek(currentWeek);
+  const weekEnd = endOfWeek(currentWeek);
+  const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
+  const timeSlots = Array.from({ length: 24 }, (_, i) => setHours(startOfDay(new Date()), i));
+
+  // Get events for the current week
+  const weekEvents = (events as any[]).filter((event: any) => {
+    const eventDate = new Date(event.startTime);
+    return eventDate >= weekStart && eventDate <= weekEnd;
+  });
+
+  // Get events for a specific time slot
+  const getEventsForTimeSlot = (day: Date, hour: number) => {
+    return weekEvents.filter((event: any) => {
+      const eventStart = new Date(event.startTime);
+      const eventEnd = new Date(event.endTime);
+      const slotStart = setHours(day, hour);
+      const slotEnd = setHours(day, hour + 1);
+      
+      return isSameDay(eventStart, day) && 
+             eventStart < slotEnd && 
+             eventEnd > slotStart;
+    });
+  };
 
   return (
     <div className="flex h-screen bg-background">
@@ -573,6 +604,193 @@ export default function Calendar() {
                   </CardContent>
                 </Card>
               </div>
+            </div>
+
+            {/* Weekly Staff Schedule */}
+            <div className="mt-8">
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="flex items-center">
+                      <Clock className="mr-2 h-5 w-5" />
+                      Weekly Staff Schedule - {format(weekStart, "MMM dd")} to {format(weekEnd, "MMM dd, yyyy")}
+                    </CardTitle>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigateWeek("prev")}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentWeek(new Date())}
+                      >
+                        This Week
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigateWeek("next")}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <div className="min-w-[800px]">
+                      {/* Header with days */}
+                      <div className="grid grid-cols-8 gap-1 mb-2">
+                        <div className="p-2 text-xs font-medium text-gray-500">Time</div>
+                        {weekDays.map((day) => (
+                          <div key={day.toISOString()} className="p-2 text-center">
+                            <div className="font-medium text-sm">
+                              {format(day, "EEE")}
+                            </div>
+                            <div className={`text-xs ${isSameDay(day, new Date()) ? "text-blue-600 font-medium" : "text-gray-600"}`}>
+                              {format(day, "MMM dd")}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Time slots grid */}
+                      <div className="space-y-1">
+                        {timeSlots.map((timeSlot, timeIndex) => {
+                          const hour = timeIndex;
+                          // Only show business hours (6 AM to 10 PM)
+                          if (hour < 6 || hour > 22) return null;
+                          
+                          return (
+                            <div key={timeIndex} className="grid grid-cols-8 gap-1">
+                              <div className="p-2 text-xs text-gray-500 font-medium border-r">
+                                {format(timeSlot, "h:mm a")}
+                              </div>
+                              {weekDays.map((day) => {
+                                const slotEvents = getEventsForTimeSlot(day, hour);
+                                return (
+                                  <div 
+                                    key={`${day.toISOString()}-${hour}`}
+                                    className="p-1 border border-gray-100 min-h-12 hover:bg-gray-50 cursor-pointer"
+                                  >
+                                    <div className="space-y-1">
+                                      {slotEvents.map((event: any) => (
+                                        <div
+                                          key={event.id}
+                                          className={`
+                                            text-xs p-1 rounded text-white truncate
+                                            ${getEventTypeColor(event.eventType)}
+                                          `}
+                                          title={`${event.title} - ${format(new Date(event.startTime), "h:mm a")} to ${format(new Date(event.endTime), "h:mm a")}`}
+                                        >
+                                          <div className="font-medium truncate">{event.title}</div>
+                                          {event.location && (
+                                            <div className="flex items-center">
+                                              <MapPin className="w-2 h-2 mr-1" />
+                                              <span className="truncate">{event.location}</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Weekly Schedule Summary */}
+                  <div className="mt-6 pt-6 border-t">
+                    <h4 className="font-medium text-sm mb-4">This Week's Highlights</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-blue-50 p-3 rounded-lg">
+                        <div className="flex items-center mb-2">
+                          <Users className="w-4 h-4 mr-2 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-800">Training Sessions</span>
+                        </div>
+                        <div className="text-lg font-bold text-blue-600">
+                          {weekEvents.filter((e: any) => e.eventType === "training" || e.eventType === "physical_training").length}
+                        </div>
+                        <div className="text-xs text-blue-600">Scheduled this week</div>
+                      </div>
+
+                      <div className="bg-green-50 p-3 rounded-lg">
+                        <div className="flex items-center mb-2">
+                          <Calendar className="w-4 h-4 mr-2 text-green-600" />
+                          <span className="text-sm font-medium text-green-800">Ceremonies</span>
+                        </div>
+                        <div className="text-lg font-bold text-green-600">
+                          {weekEvents.filter((e: any) => e.eventType === "ceremony").length}
+                        </div>
+                        <div className="text-xs text-green-600">Special events</div>
+                      </div>
+
+                      <div className="bg-orange-50 p-3 rounded-lg">
+                        <div className="flex items-center mb-2">
+                          <Clock className="w-4 h-4 mr-2 text-orange-600" />
+                          <span className="text-sm font-medium text-orange-800">Total Hours</span>
+                        </div>
+                        <div className="text-lg font-bold text-orange-600">
+                          {weekEvents.reduce((total: number, event: any) => {
+                            const start = new Date(event.startTime);
+                            const end = new Date(event.endTime);
+                            return total + Math.max(0, (end.getTime() - start.getTime()) / (1000 * 60 * 60));
+                          }, 0).toFixed(1)}
+                        </div>
+                        <div className="text-xs text-orange-600">Scheduled hours</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Staff Assignments */}
+                  <div className="mt-6 pt-6 border-t">
+                    <h4 className="font-medium text-sm mb-4">Staff Assignments This Week</h4>
+                    <div className="space-y-2">
+                      {weekEvents.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {weekEvents
+                            .sort((a: any, b: any) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+                            .map((event: any) => (
+                              <div key={event.id} className="flex items-center justify-between p-3 border rounded-lg">
+                                <div className="flex-1">
+                                  <div className="font-medium text-sm">{event.title}</div>
+                                  <div className="text-xs text-gray-600">
+                                    {format(new Date(event.startTime), "EEE, MMM dd • h:mm a")} - {format(new Date(event.endTime), "h:mm a")}
+                                  </div>
+                                  {event.location && (
+                                    <div className="flex items-center text-xs text-gray-500 mt-1">
+                                      <MapPin className="w-3 h-3 mr-1" />
+                                      {event.location}
+                                    </div>
+                                  )}
+                                </div>
+                                <Badge 
+                                  className={`${getEventTypeColor(event.eventType)} text-white text-xs`}
+                                >
+                                  {event.eventType}
+                                </Badge>
+                              </div>
+                            ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          <Calendar className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                          <p className="text-sm">No events scheduled for this week</p>
+                          <p className="text-xs">Create events using the button above</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </main>
