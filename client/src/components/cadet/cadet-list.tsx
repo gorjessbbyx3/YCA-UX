@@ -332,8 +332,15 @@ export default function CadetList({ campus }: CadetListProps) {
                     <Button variant="outline" size="sm" onClick={() => openDetailModal(cadet)}>
                       <Eye className="w-4 h-4" />
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => onEdit(cadet)}>
                       <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => window.location.href = `/cadet/${cadet.id}`}
+                    >
+                      Dashboard
                     </Button>
                   </div>
                 </div>

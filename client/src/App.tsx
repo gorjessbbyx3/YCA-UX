@@ -11,6 +11,7 @@ import CadetManagement from "@/pages/cadet-management";
 import Applications from "@/pages/applications";
 import Scheduling from "@/pages/scheduling";
 import Calendar from "@/pages/calendar";
+import CadetDashboard from "@/pages/cadet-dashboard";
 import Academics from "@/pages/academics";
 import Mentorship from "@/pages/mentorship";
 import Inventory from "@/pages/inventory";
@@ -27,9 +28,10 @@ function Router() {
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/cadets" component={CadetManagement} />
+          <Route path="/cadet/:id" component={CadetDashboard} />
           <Route path="/applications" component={Applications} />
           <Route path="/scheduling" component={Scheduling} />
-        <Route path="/calendar" component={Calendar} />
+          <Route path="/calendar" component={Calendar} />
           <Route path="/academics" component={Academics} />
           <Route path="/mentorship" component={Mentorship} />
           <Route path="/inventory" component={Inventory} />
