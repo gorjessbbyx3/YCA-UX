@@ -4,6 +4,24 @@
 
 This is a full-stack web application designed for staff at the Hawaii Youth Challenge Academy to manage cadets, applications, events, and administrative tasks. The system serves as a comprehensive management portal for the academy's operations across two campuses (Oahu and Hilo).
 
+### About the National Guard Youth Challenge Program
+
+**Mission**: The mission of the National Guard Youth Challenge Program is to intervene in and reclaim the lives of 16-18 year old high school dropouts, producing program graduates with the values, life skills, education, and self-discipline necessary to succeed as productive citizens.
+
+**Program Overview**: The National Guard Youth Challenge Program is a community-based Quasi-Military program that leads, trains and mentors 16–18 year-old high school dropouts so that they may become productive citizens in America's future. This award-winning program has been recognized as one of the nation's most effective and cost efficient programs for targeting youth who are at the greatest risk for substance abuse, teen pregnancy, delinquency, and criminal activity.
+
+**Program Structure**: The 22-week Residential Phase is followed by a year-long mentoring relationship with a specially trained member from each youth's community.
+
+**Eight Core Components**:
+1. **Academy Excellence** - Academic achievement and educational goals
+2. **Health and Hygiene** - Personal wellness and health practices
+3. **Job Skills** - Career preparation and vocational training
+4. **Leadership/Followership** - Leadership development and teamwork
+5. **Life Coping Skills** - Personal development and resilience
+6. **Service to the Community** - Civic engagement and community service
+7. **Physical Fitness** - Health, fitness, and physical conditioning
+8. **Responsible Citizenship** - Civic responsibility and character development
+
 ## Recent Changes (January 2025)
 - Added dedicated Calendar page with comprehensive month/week/day views and event creation
 - Restructured Scheduling page to focus on advanced event management, bulk creation, and resource allocation
@@ -48,12 +66,12 @@ Background style: Light military green theme.
 
 ### Data Models
 - **Users**: Staff accounts with roles and campus assignments
-- **Cadets**: Student records with comprehensive tracking
-- **Applications**: Admission applications with status workflow
+- **Cadets**: Student records with comprehensive tracking aligned with the 8 core program components
+- **Applications**: Admission applications with status workflow for 16-18 year old high school dropouts
 - **Events**: Campus events with comprehensive scheduling, recurring events, and conflict detection
-- **Mentorships**: Mentor-cadet relationships
-- **Inventory**: Equipment and resource tracking
-- **Activities**: System activity logging
+- **Mentorships**: Mentor-cadet relationships supporting the year-long post-residential mentoring phase
+- **Inventory**: Equipment and resource tracking for program operations
+- **Activities**: System activity logging for program compliance and reporting
 
 ### Key Pages
 - **Dashboard**: Real-time metrics and activity overview
