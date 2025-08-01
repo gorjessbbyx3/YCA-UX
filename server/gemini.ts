@@ -1,15 +1,19 @@
 
 import axios from 'axios';
-import type { Application } from "@shared/schema";
+import type { Application } from '@shared/schema';
 
-const GROK_API_KEY = process.env.GROK_API_KEY || "";
 const GROK_API_URL = "https://api.x.ai/v1/chat/completions";
+const GROK_API_KEY = process.env.GROK_API_KEY;
 
 if (!GROK_API_KEY) {
   console.warn("GROK_API_KEY environment variable is not set. AI features will not work properly.");
 }
 
 export async function analyzeApplication(application: Application): Promise<string> {
+  if (!GROK_API_KEY) {
+    return "AI analysis unavailable - GROK_API_KEY not configured";
+  }
+
   try {
     const prompt = `Analyze this Youth Challenge Academy application and provide insights on the applicant's suitability, potential challenges, and recommendations for success:
 
@@ -49,17 +53,22 @@ Format your response as a structured assessment suitable for staff review.`;
       headers: {
         'Authorization': `Bearer ${GROK_API_KEY}`,
         'Content-Type': 'application/json'
-      }
+      },
+      timeout: 30000
     });
 
     return response.data.choices[0]?.message?.content || "Analysis could not be completed";
   } catch (error) {
     console.error("Error analyzing application:", error);
-    throw new Error(`Failed to analyze application: ${error}`);
+    return "Error: Could not complete AI analysis. Please try again later.";
   }
 }
 
 export async function generateCadetInsights(cadet: any): Promise<string> {
+  if (!GROK_API_KEY) {
+    return "AI insights unavailable - GROK_API_KEY not configured";
+  }
+
   try {
     const prompt = `Generate insights and recommendations for this Youth Challenge Academy cadet's development:
 
@@ -99,12 +108,13 @@ Format as actionable insights for staff.`;
       headers: {
         'Authorization': `Bearer ${GROK_API_KEY}`,
         'Content-Type': 'application/json'
-      }
+      },
+      timeout: 30000
     });
 
     return response.data.choices[0]?.message?.content || "Insights could not be generated";
   } catch (error) {
     console.error("Error generating cadet insights:", error);
-    throw new Error(`Failed to generate insights: ${error}`);
+    return "Error: Could not generate AI insights. Please try again later.";
   }
 }
