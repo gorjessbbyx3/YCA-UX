@@ -60,10 +60,19 @@ export const cadets = pgTable("cadets", {
   startDate: date("start_date"),
   graduationDate: date("graduation_date"),
   status: varchar("status").notNull().default("active"), // active, graduated, dismissed, withdrawn
-  academicProgress: decimal("academic_progress", { precision: 5, scale: 2 }).default("0"),
-  fitnessProgress: decimal("fitness_progress", { precision: 5, scale: 2 }).default("0"),
-  leadershipProgress: decimal("leadership_progress", { precision: 5, scale: 2 }).default("0"),
-  serviceHours: integer("service_hours").default(0),
+  // 8 Core Component Progress (0-100 scale)
+  academicExcellence: decimal("academic_excellence", { precision: 5, scale: 2 }).default("0"), // GED/diploma progress, TABE scores
+  healthHygiene: decimal("health_hygiene", { precision: 5, scale: 2 }).default("0"), // Health education, nutrition, substance abuse awareness
+  jobSkills: decimal("job_skills", { precision: 5, scale: 2 }).default("0"), // Career assessment, resume, interview skills
+  leadership: decimal("leadership", { precision: 5, scale: 2 }).default("0"), // Leadership roles, military customs, character development
+  lifeCopingSkills: decimal("life_coping_skills", { precision: 5, scale: 2 }).default("0"), // Self-regulation, conflict resolution, financial literacy
+  physicalFitness: decimal("physical_fitness", { precision: 5, scale: 2 }).default("0"), // President's Challenge fitness standards
+  responsibleCitizenship: decimal("responsible_citizenship", { precision: 5, scale: 2 }).default("0"), // Civics, voting registration, government understanding
+  communityService: decimal("community_service", { precision: 5, scale: 2 }).default("0"), // Service hours completion (minimum 40 hours)
+  
+  serviceHours: integer("service_hours").default(0), // Actual hours completed
+  tabeScoreMath: integer("tabe_score_math"), // TABE math score
+  tabeScoreReading: integer("tabe_score_reading"), // TABE reading score
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

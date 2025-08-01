@@ -118,15 +118,20 @@ export default function Calendar() {
     );
   };
 
-  // Get event type color
+  // Get event type color based on 8 core components
   const getEventTypeColor = (type: string) => {
     switch (type) {
-      case "training": return "bg-blue-500";
-      case "ceremony": return "bg-purple-500";
-      case "physical_training": return "bg-green-500";
-      case "academic": return "bg-yellow-500";
-      case "community_service": return "bg-orange-500";
-      case "graduation": return "bg-red-500";
+      case "academic_excellence": return "bg-blue-600"; // Academic classes, GED prep
+      case "health_hygiene": return "bg-green-600"; // Health education, nutrition
+      case "job_skills": return "bg-amber-600"; // Career prep, vocational training
+      case "leadership": return "bg-purple-600"; // Leadership development, military customs
+      case "life_coping_skills": return "bg-indigo-600"; // Self-regulation, conflict resolution
+      case "physical_fitness": return "bg-emerald-600"; // PT, President's Challenge
+      case "responsible_citizenship": return "bg-slate-600"; // Civics, government
+      case "community_service": return "bg-orange-600"; // Service projects, 40+ hours
+      case "ceremony": return "bg-red-600"; // Special ceremonies
+      case "graduation": return "bg-gold"; // Graduation events
+      case "meeting": return "bg-gray-500"; // Staff meetings
       default: return "bg-gray-500";
     }
   };
@@ -258,13 +263,17 @@ export default function Calendar() {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="training">Training Session</SelectItem>
+                                    <SelectItem value="academic_excellence">Academic Excellence</SelectItem>
+                                    <SelectItem value="health_hygiene">Health and Hygiene</SelectItem>
+                                    <SelectItem value="job_skills">Job Skills</SelectItem>
+                                    <SelectItem value="leadership">Leadership/Followership</SelectItem>
+                                    <SelectItem value="life_coping_skills">Life Coping Skills</SelectItem>
+                                    <SelectItem value="physical_fitness">Physical Fitness</SelectItem>
+                                    <SelectItem value="responsible_citizenship">Responsible Citizenship</SelectItem>
+                                    <SelectItem value="community_service">Service to Community</SelectItem>
                                     <SelectItem value="ceremony">Ceremony</SelectItem>
-                                    <SelectItem value="physical_training">Physical Training</SelectItem>
-                                    <SelectItem value="academic">Academic</SelectItem>
-                                    <SelectItem value="community_service">Community Service</SelectItem>
                                     <SelectItem value="graduation">Graduation</SelectItem>
-                                    <SelectItem value="meeting">Meeting</SelectItem>
+                                    <SelectItem value="meeting">Staff Meeting</SelectItem>
                                     <SelectItem value="other">Other</SelectItem>
                                   </SelectContent>
                                 </Select>
@@ -576,29 +585,38 @@ export default function Calendar() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2 text-xs">
+                      <div className="font-medium mb-2">8 Core Components:</div>
                       <div className="flex items-center">
-                        <div className="w-3 h-3 bg-blue-500 rounded mr-2"></div>
-                        <span>Training</span>
+                        <div className="w-3 h-3 bg-blue-600 rounded mr-2"></div>
+                        <span>Academic Excellence</span>
                       </div>
                       <div className="flex items-center">
-                        <div className="w-3 h-3 bg-purple-500 rounded mr-2"></div>
-                        <span>Ceremony</span>
+                        <div className="w-3 h-3 bg-green-600 rounded mr-2"></div>
+                        <span>Health & Hygiene</span>
                       </div>
                       <div className="flex items-center">
-                        <div className="w-3 h-3 bg-green-500 rounded mr-2"></div>
-                        <span>Physical Training</span>
+                        <div className="w-3 h-3 bg-amber-600 rounded mr-2"></div>
+                        <span>Job Skills</span>
                       </div>
                       <div className="flex items-center">
-                        <div className="w-3 h-3 bg-yellow-500 rounded mr-2"></div>
-                        <span>Academic</span>
+                        <div className="w-3 h-3 bg-purple-600 rounded mr-2"></div>
+                        <span>Leadership</span>
                       </div>
                       <div className="flex items-center">
-                        <div className="w-3 h-3 bg-orange-500 rounded mr-2"></div>
+                        <div className="w-3 h-3 bg-indigo-600 rounded mr-2"></div>
+                        <span>Life Coping Skills</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-emerald-600 rounded mr-2"></div>
+                        <span>Physical Fitness</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-slate-600 rounded mr-2"></div>
+                        <span>Citizenship</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-orange-600 rounded mr-2"></div>
                         <span>Community Service</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 bg-red-500 rounded mr-2"></div>
-                        <span>Graduation</span>
                       </div>
                     </div>
                   </CardContent>
@@ -717,7 +735,10 @@ export default function Calendar() {
                           <span className="text-sm font-medium text-blue-800">Training Sessions</span>
                         </div>
                         <div className="text-lg font-bold text-blue-600">
-                          {weekEvents.filter((e: any) => e.eventType === "training" || e.eventType === "physical_training").length}
+                          {weekEvents.filter((e: any) => 
+                            ["academic_excellence", "health_hygiene", "job_skills", "leadership", 
+                             "life_coping_skills", "physical_fitness", "responsible_citizenship", "community_service"].includes(e.eventType)
+                          ).length}
                         </div>
                         <div className="text-xs text-blue-600">Scheduled this week</div>
                       </div>
@@ -772,11 +793,9 @@ export default function Calendar() {
                                     </div>
                                   )}
                                 </div>
-                                <Badge 
-                                  className={`${getEventTypeColor(event.eventType)} text-white text-xs`}
-                                >
-                                  {event.eventType}
-                                </Badge>
+                                <div className={`${getEventTypeColor(event.eventType)} text-white text-xs px-2 py-1 rounded`}>
+                                  {event.eventType.replace(/_/g, ' ')}
+                                </div>
                               </div>
                             ))}
                         </div>

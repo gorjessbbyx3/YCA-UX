@@ -23,10 +23,12 @@ This is a full-stack web application designed for staff at the Hawaii Youth Chal
 8. **Responsible Citizenship** - Civic responsibility and character development
 
 ## Recent Changes (January 2025)
-- Added dedicated Calendar page with comprehensive month/week/day views and event creation
-- Restructured Scheduling page to focus on advanced event management, bulk creation, and resource allocation
-- Updated navigation system to separate Calendar and Event Scheduling functionality
-- Enhanced event management with conflict detection and recurring event support
+- Added comprehensive weekly staff schedule below monthly calendar with hourly time slots (6 AM-10 PM)
+- Enhanced event types to align with the 8 core components of the National Guard Youth Challenge Program
+- Updated cadet schema to track progress across all 8 core components with detailed metrics
+- Integrated TABE scoring system for academic excellence tracking
+- Added color-coded event system based on core component categories
+- Enhanced scheduling system with core component-specific event creation and management
 
 ## User Preferences
 

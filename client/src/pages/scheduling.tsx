@@ -148,18 +148,24 @@ export default function Scheduling() {
     new Date(event.startTime) > new Date()
   ).length;
 
-  const trainingEvents = (events as any[]).filter((event: any) => 
-    event.eventType === "training" || event.eventType === "physical_training"
+  const coreComponentEvents = (events as any[]).filter((event: any) => 
+    ["academic_excellence", "health_hygiene", "job_skills", "leadership", 
+     "life_coping_skills", "physical_fitness", "responsible_citizenship", "community_service"].includes(event.eventType)
   ).length;
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
-      case "training": return "bg-blue-500";
-      case "ceremony": return "bg-purple-500";
-      case "physical_training": return "bg-green-500";
-      case "academic": return "bg-yellow-500";
-      case "community_service": return "bg-orange-500";
-      case "graduation": return "bg-red-500";
+      case "academic_excellence": return "bg-blue-600";
+      case "health_hygiene": return "bg-green-600";
+      case "job_skills": return "bg-amber-600";
+      case "leadership": return "bg-purple-600";
+      case "life_coping_skills": return "bg-indigo-600";
+      case "physical_fitness": return "bg-emerald-600";
+      case "responsible_citizenship": return "bg-slate-600";
+      case "community_service": return "bg-orange-600";
+      case "ceremony": return "bg-red-600";
+      case "graduation": return "bg-gold";
+      case "meeting": return "bg-gray-500";
       default: return "bg-gray-500";
     }
   };
@@ -234,10 +240,15 @@ export default function Scheduling() {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="training">Training Session</SelectItem>
-                                    <SelectItem value="physical_training">Physical Training</SelectItem>
-                                    <SelectItem value="academic">Academic Class</SelectItem>
-                                    <SelectItem value="meeting">Meeting</SelectItem>
+                                    <SelectItem value="academic_excellence">Academic Excellence</SelectItem>
+                                    <SelectItem value="health_hygiene">Health and Hygiene</SelectItem>
+                                    <SelectItem value="job_skills">Job Skills</SelectItem>
+                                    <SelectItem value="leadership">Leadership/Followership</SelectItem>
+                                    <SelectItem value="life_coping_skills">Life Coping Skills</SelectItem>
+                                    <SelectItem value="physical_fitness">Physical Fitness</SelectItem>
+                                    <SelectItem value="responsible_citizenship">Responsible Citizenship</SelectItem>
+                                    <SelectItem value="community_service">Service to Community</SelectItem>
+                                    <SelectItem value="meeting">Staff Meeting</SelectItem>
                                     <SelectItem value="other">Other</SelectItem>
                                   </SelectContent>
                                 </Select>
@@ -450,12 +461,12 @@ export default function Scheduling() {
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center text-sm">
                     <Clock className="mr-2 h-4 w-4 text-blue-500" />
-                    Training Sessions
+                    Core Component Events
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-blue-500">{trainingEvents}</div>
-                  <p className="text-xs text-gray-600">Total scheduled</p>
+                  <div className="text-2xl font-bold text-blue-500">{coreComponentEvents}</div>
+                  <p className="text-xs text-gray-600">8 core components</p>
                 </CardContent>
               </Card>
 
