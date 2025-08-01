@@ -74,14 +74,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/cadets/:id', isAuthenticated, async (req, res) => {
+  // Campus-specific cadet routes to avoid parsing issues
+  app.get('/api/cadets/:campus', isAuthenticated, async (req: any, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const cadet = await storage.getCadet(id);
-      if (!cadet) {
-        return res.status(404).json({ message: "Cadet not found" });
+      const campus = req.params.campus;
+      // Check if this is actually a numeric ID
+      if (/^\d+$/.test(campus)) {
+        const id = parseInt(campus);
+        const cadet = await storage.getCadet(id);
+        if (!cadet) {
+          return res.status(404).json({ message: "Cadet not found" });
+        }
+        return res.json(cadet);
       }
-      res.json(cadet);
+      
+      // Otherwise treat as campus filter
+      const cadets = await storage.getCadets(campus);
+      res.json(cadets);
     } catch (error) {
       console.error("Error fetching cadet:", error);
       res.status(500).json({ message: "Failed to fetch cadet" });
@@ -145,14 +154,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/applications/:id', isAuthenticated, async (req, res) => {
+  // Campus-specific application routes to avoid parsing issues
+  app.get('/api/applications/:campus', isAuthenticated, async (req: any, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const application = await storage.getApplication(id);
-      if (!application) {
-        return res.status(404).json({ message: "Application not found" });
+      const campus = req.params.campus;
+      // Check if this is actually a numeric ID
+      if (/^\d+$/.test(campus)) {
+        const id = parseInt(campus);
+        const application = await storage.getApplication(id);
+        if (!application) {
+          return res.status(404).json({ message: "Application not found" });
+        }
+        return res.json(application);
       }
-      res.json(application);
+      
+      // Otherwise treat as campus filter
+      const user = await storage.getUser(req.user.claims.sub);
+      const applications = await storage.getApplications(undefined, campus);
+      res.json(applications);
     } catch (error) {
       console.error("Error fetching application:", error);
       res.status(500).json({ message: "Failed to fetch application" });
@@ -252,6 +271,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/events', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = z.object({
+        title: z.string().min(1),
+        description: z.string().optional(),
+        eventType: z.string(),
+        startTime: z.string().transform(str => new Date(str)),
+        endTime: z.string().transform(str => new Date(str)),
+        location: z.string().optional(),
+        campus: z.string(),
+        maxParticipants: z.number().optional(),
+        isRequired: z.boolean().optional(),
+      }).safeParse(req.body);
+
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid event data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const user = await storage.getUser(req.user.claims.sub);
+      const eventData = {
+        ...validation.data,
+        createdBy: user?.id || req.user.claims.sub,
+      };
+
+      const event = await storage.createEvent(eventData);
+      res.status(201).json(event);
+    } catch (error) {
+      console.error("Error creating event:", error);
+      res.status(500).json({ message: "Failed to create event" });
+    }
+  });
+
   // Mentorships routes
   app.get('/api/mentorships', isAuthenticated, async (req, res) => {
     try {
@@ -261,6 +315,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching mentorships:", error);
       res.status(500).json({ message: "Failed to fetch mentorships" });
+    }
+  });
+
+  app.post('/api/mentorships', isAuthenticated, async (req: any, res) => {
+    try {
+      const validation = z.object({
+        cadetId: z.number(),
+        mentorName: z.string().min(1),
+        mentorEmail: z.string().email().optional(),
+        mentorPhone: z.string().optional(),
+        assignedDate: z.string(),
+        meetingFrequency: z.string().optional(),
+        notes: z.string().optional(),
+      }).safeParse(req.body);
+
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid mentorship data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const mentorship = await storage.createMentorship(validation.data);
+      res.status(201).json(mentorship);
+    } catch (error) {
+      console.error("Error creating mentorship:", error);
+      res.status(500).json({ message: "Failed to create mentorship" });
     }
   });
 
@@ -275,6 +356,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching inventory:", error);
       res.status(500).json({ message: "Failed to fetch inventory" });
+    }
+  });
+
+  app.patch('/api/inventory/:id', isAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validation = z.object({
+        itemName: z.string().optional(),
+        category: z.string().optional(),
+        description: z.string().optional(),
+        quantity: z.number().optional(),
+        minQuantity: z.number().optional(),
+        maxQuantity: z.number().optional(),
+        unitCost: z.number().transform(num => num.toString()).optional(),
+        location: z.string().optional(),
+        supplier: z.string().optional(),
+        notes: z.string().optional(),
+      }).safeParse(req.body);
+
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid inventory data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const item = await storage.updateInventoryItem(id, validation.data);
+      res.json(item);
+    } catch (error) {
+      console.error("Error updating inventory:", error);
+      res.status(500).json({ message: "Failed to update inventory" });
     }
   });
 

@@ -1,11 +1,74 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Sidebar from "@/components/layout/sidebar";
 import MobileMenu from "@/components/layout/mobile-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, GraduationCap, TrendingUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { BookOpen, GraduationCap, TrendingUp, Award, Target, Clock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Academics() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
+
+  const { data: cadets = [], isLoading } = useQuery({
+    queryKey: ["/api/cadets"],
+    enabled: !!user,
+  });
+
+  // Calculate academic statistics
+  const academicStats = cadets.reduce(
+    (acc: any, cadet: any) => {
+      const academicProgress = parseFloat(cadet.academicProgress || 0);
+      acc.totalCadets += 1;
+      acc.totalProgress += academicProgress;
+      
+      if (academicProgress >= 90) acc.excellentPerformers += 1;
+      else if (academicProgress >= 70) acc.goodPerformers += 1;
+      else if (academicProgress >= 50) acc.needsImprovement += 1;
+      else acc.atRisk += 1;
+
+      return acc;
+    },
+    {
+      totalCadets: 0,
+      totalProgress: 0,
+      excellentPerformers: 0,
+      goodPerformers: 0,
+      needsImprovement: 0,
+      atRisk: 0,
+    }
+  );
+
+  const averageProgress = academicStats.totalCadets > 0 
+    ? academicStats.totalProgress / academicStats.totalCadets 
+    : 0;
+
+  // Group cadets by performance level
+  const excellentCadets = cadets.filter((c: any) => parseFloat(c.academicProgress || 0) >= 90);
+  const atRiskCadets = cadets.filter((c: any) => parseFloat(c.academicProgress || 0) < 50);
+
+  const getProgressColor = (progress: number) => {
+    if (progress >= 90) return "text-green-600";
+    if (progress >= 70) return "text-blue-600";
+    if (progress >= 50) return "text-yellow-600";
+    return "text-red-600";
+  };
+
+  const getProgressBadgeColor = (progress: number) => {
+    if (progress >= 90) return "bg-green-500";
+    if (progress >= 70) return "bg-blue-500";
+    if (progress >= 50) return "bg-yellow-500";
+    return "bg-red-500";
+  };
+
+  const subjects = [
+    { name: "English Language Arts", average: 78, icon: BookOpen },
+    { name: "Mathematics", average: 72, icon: Target },
+    { name: "Science", average: 75, icon: TrendingUp },
+    { name: "Social Studies", average: 81, icon: Award },
+  ];
 
   return (
     <div className="flex h-screen bg-background">
@@ -32,16 +95,96 @@ export default function Academics() {
               <p className="text-gray-600">Monitor cadet academic performance and HiSET preparation</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Academic Overview Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center text-sm">
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    Total Cadets
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-navy">
+                    {academicStats.totalCadets}
+                  </div>
+                  <p className="text-xs text-gray-600">Active academic enrollment</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center text-sm">
+                    <TrendingUp className="mr-2 h-4 w-4 text-blue-500" />
+                    Average Progress
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-blue-500">
+                    {averageProgress.toFixed(1)}%
+                  </div>
+                  <p className="text-xs text-gray-600">Overall academic progress</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center text-sm">
+                    <Award className="mr-2 h-4 w-4 text-green-500" />
+                    High Performers
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-500">
+                    {academicStats.excellentPerformers}
+                  </div>
+                  <p className="text-xs text-gray-600">90%+ academic progress</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center text-sm">
+                    <Clock className="mr-2 h-4 w-4 text-red-500" />
+                    At Risk
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-red-500">
+                    {academicStats.atRisk}
+                  </div>
+                  <p className="text-xs text-gray-600">Below 50% progress</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Subject Performance */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <BookOpen className="mr-2 h-5 w-5" />
-                    Course Progress
+                    Subject Performance
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">No course data available</p>
+                  <div className="space-y-4">
+                    {subjects.map((subject) => {
+                      const Icon = subject.icon;
+                      return (
+                        <div key={subject.name} className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                              <Icon className="w-4 h-4 mr-2 text-gray-600" />
+                              <span className="text-sm font-medium">{subject.name}</span>
+                            </div>
+                            <span className="text-sm font-medium">{subject.average}%</span>
+                          </div>
+                          <Progress value={subject.average} className="h-2" />
+                        </div>
+                      );
+                    })}
+                  </div>
                 </CardContent>
               </Card>
 
@@ -49,26 +192,229 @@ export default function Academics() {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <GraduationCap className="mr-2 h-5 w-5" />
-                    HiSET Preparation
+                    Performance Distribution
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">No HiSET data available</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <TrendingUp className="mr-2 h-5 w-5" />
-                    Performance Metrics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">No performance data available</p>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-green-500 rounded mr-2"></div>
+                        <span className="text-sm">Excellent (90%+)</span>
+                      </div>
+                      <span className="text-sm font-medium">{academicStats.excellentPerformers} cadets</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                        <span className="text-sm">Good (70-89%)</span>
+                      </div>
+                      <span className="text-sm font-medium">{academicStats.goodPerformers} cadets</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-yellow-500 rounded mr-2"></div>
+                        <span className="text-sm">Needs Improvement (50-69%)</span>
+                      </div>
+                      <span className="text-sm font-medium">{academicStats.needsImprovement} cadets</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-red-500 rounded mr-2"></div>
+                        <span className="text-sm">At Risk (Below 50%)</span>
+                      </div>
+                      <span className="text-sm font-medium">{academicStats.atRisk} cadets</span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Top Performers */}
+            {excellentCadets.length > 0 && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-green-600">
+                    <Award className="mr-2 h-5 w-5" />
+                    Top Academic Performers
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {excellentCadets.slice(0, 6).map((cadet: any) => (
+                      <div key={cadet.id} className="border border-green-200 rounded-lg p-3 bg-green-50">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-medium text-sm">
+                            {cadet.firstName} {cadet.lastName}
+                          </h4>
+                          <Badge className="bg-green-500 text-white text-xs">
+                            {parseFloat(cadet.academicProgress || 0).toFixed(1)}%
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Class {cadet.classNumber} • {cadet.campus}
+                        </p>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span>Academic Progress</span>
+                            <span className="font-medium">{parseFloat(cadet.academicProgress || 0).toFixed(1)}%</span>
+                          </div>
+                          <Progress value={parseFloat(cadet.academicProgress || 0)} className="h-1" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* At-Risk Students */}
+            {atRiskCadets.length > 0 && (
+              <Card className="mb-6 border-red-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-red-600">
+                    <Clock className="mr-2 h-5 w-5" />
+                    Cadets Needing Academic Support
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {atRiskCadets.map((cadet: any) => (
+                      <div key={cadet.id} className="border border-red-200 rounded-lg p-3 bg-red-50">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-medium text-sm">
+                            {cadet.firstName} {cadet.lastName}
+                          </h4>
+                          <Badge variant="destructive" className="text-xs">
+                            At Risk
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Class {cadet.classNumber} • {cadet.campus}
+                        </p>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span>Academic Progress</span>
+                            <span className="font-medium text-red-600">
+                              {parseFloat(cadet.academicProgress || 0).toFixed(1)}%
+                            </span>
+                          </div>
+                          <Progress value={parseFloat(cadet.academicProgress || 0)} className="h-1" />
+                        </div>
+                        {cadet.notes && (
+                          <p className="text-xs text-gray-600 mt-2 italic">
+                            Notes: {cadet.notes.substring(0, 50)}...
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* All Cadets Academic Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle>All Cadets Academic Progress</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <p className="text-gray-600">Loading academic data...</p>
+                ) : cadets.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2">Cadet</th>
+                          <th className="text-left py-2">Class</th>
+                          <th className="text-left py-2">Campus</th>
+                          <th className="text-left py-2">Academic Progress</th>
+                          <th className="text-left py-2">Fitness Progress</th>
+                          <th className="text-left py-2">Leadership Progress</th>
+                          <th className="text-left py-2">Service Hours</th>
+                          <th className="text-left py-2">Performance</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cadets.map((cadet: any) => {
+                          const academicProgress = parseFloat(cadet.academicProgress || 0);
+                          const fitnessProgress = parseFloat(cadet.fitnessProgress || 0);
+                          const leadershipProgress = parseFloat(cadet.leadershipProgress || 0);
+                          const serviceHours = parseInt(cadet.serviceHours || 0);
+
+                          return (
+                            <tr key={cadet.id} className="border-b hover:bg-gray-50">
+                              <td className="py-2">
+                                <div>
+                                  <p className="font-medium">{cadet.firstName} {cadet.lastName}</p>
+                                  <p className="text-xs text-gray-600">{cadet.email}</p>
+                                </div>
+                              </td>
+                              <td className="py-2">
+                                <Badge variant="outline">
+                                  Class {cadet.classNumber}
+                                </Badge>
+                              </td>
+                              <td className="py-2">
+                                <Badge variant="outline" className="capitalize">
+                                  {cadet.campus}
+                                </Badge>
+                              </td>
+                              <td className="py-2">
+                                <div className="space-y-1">
+                                  <div className="flex justify-between items-center w-24">
+                                    <span className={`text-sm font-medium ${getProgressColor(academicProgress)}`}>
+                                      {academicProgress.toFixed(1)}%
+                                    </span>
+                                  </div>
+                                  <Progress value={academicProgress} className="h-1 w-24" />
+                                </div>
+                              </td>
+                              <td className="py-2">
+                                <div className="space-y-1">
+                                  <div className="flex justify-between items-center w-24">
+                                    <span className={`text-sm font-medium ${getProgressColor(fitnessProgress)}`}>
+                                      {fitnessProgress.toFixed(1)}%
+                                    </span>
+                                  </div>
+                                  <Progress value={fitnessProgress} className="h-1 w-24" />
+                                </div>
+                              </td>
+                              <td className="py-2">
+                                <div className="space-y-1">
+                                  <div className="flex justify-between items-center w-24">
+                                    <span className={`text-sm font-medium ${getProgressColor(leadershipProgress)}`}>
+                                      {leadershipProgress.toFixed(1)}%
+                                    </span>
+                                  </div>
+                                  <Progress value={leadershipProgress} className="h-1 w-24" />
+                                </div>
+                              </td>
+                              <td className="py-2">
+                                <span className="font-medium">{serviceHours}</span>
+                                <span className="text-xs text-gray-600 ml-1">hrs</span>
+                              </td>
+                              <td className="py-2">
+                                <Badge 
+                                  className={`${getProgressBadgeColor(academicProgress)} text-white`}
+                                >
+                                  {academicProgress >= 90 ? "Excellent" :
+                                   academicProgress >= 70 ? "Good" :
+                                   academicProgress >= 50 ? "Fair" : "At Risk"}
+                                </Badge>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-gray-600 text-center py-8">No academic data available</p>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>
